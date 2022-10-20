@@ -83,7 +83,6 @@ public class UserDao3 {
             ps = c.prepareStatement("DELETE FROM users"); //쿼리 입력
             rs = ps.executeQuery();
             rs.next(); //쿼리 업데이트
-            return rs.getInt(1);
 
             //c, ps, rs가 null일 때 리소스 반환이 불가해 서버가 down되는 치명적 문제 발생
             //connection, preparedStatement에서 에러가 나도 ps.close() c.close()를 실행하기 위한 처리
@@ -113,24 +112,38 @@ public class UserDao3 {
 
         //쿼리 count
         public int getCount() {
-            Map<String, String> env = System.getenv(); //없어도 됨?
+            Connection c = null;
+            PreparedStatement psCnt = null;
+            ResultSet rs = null;
             try {
-                Connection conn = cm.makeConnection();
-
-                PreparedStatement psCnt = conn.prepareStatement("SELECT COUNT(*) FROM users;");
-
-                //쿼리 입력
-                ResultSet rs = psCnt.executeQuery();
-                System.out.println("DB Get Count");
-                rs.next();
-                int count = rs.getInt(1);
-
-                rs.close();
-                psCnt.close();
-                conn.close();
+                c = cm.makeConnection();
+                psCnt = c.prepareStatement("SELECT COUNT(*) FROM users;"); //쿼리 입력
+                rs = psCnt.executeQuery();
+                rs.next(); //쿼리 업데이트
+                return rs.getInt(1);
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                    }
+                    if (psCnt != null) {
+                        try {
+                            psCnt.close();
+                        } catch (SQLException e) {
+                        }
+                    }
+                    if (c != null) {
+                        try {
+                            c.close();
+                        } catch (SQLException e) {
+                        }
+                    }
+
+                }
             }
         }
             public static void main (String[]args){
