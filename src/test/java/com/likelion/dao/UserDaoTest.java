@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 
 import java.sql.SQLException;
 
@@ -30,6 +31,28 @@ class UserDao3Test {
         User user = userDao.findById(id);
         assertEquals("DH", user.getName());
         assertEquals("DH", user.getPassword());
+    }
+
+    @Test
+    //유저 데이터를 여러 개 넣어보고 삭제와 추가가 모두 정상 동작하는지 테스트
+    void count() throws SQLException{
+//        ApplicationContext context = new GenericXmlApplicationContext(
+//                "applicationContext.xml");
+
+        User user1 = new User("1", "Kim", "1123");
+        User user2 = new User("2", "Cho", "3321");
+        User user3 = new User("3", "Jang", "5532");
+
+        UserDao3 userDao = context.getBean("awsUdserDao", UserDao3.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount());
+
+        userDao.add(user1);
+        assertEquals(1, userDao.getCount());
+        userDao.add(user2);
+        assertEquals(2, userDao.getCount());
+        userDao.add(user3);
+        assertEquals(3, userDao.getCount());
     }
 }
 
