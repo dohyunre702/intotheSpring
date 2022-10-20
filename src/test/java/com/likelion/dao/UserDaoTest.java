@@ -20,13 +20,16 @@ class UserDao3Test {
     ApplicationContext context; //ApplicationContext 인터페이스 선언
 
     @Test
-    void addAndSelect() {
+    void addAndGet() throws SQLException {
         UserDao3 userDao = context.getBean("awsUserDao", UserDao3.class);
-        String id = "12";
-        User user = new User(id, "DH", "1122333");
-        userDao.add(user);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount());
+
+        String id = "29";
+        userDao.add(new User(id, "Lee", "1234"));
+        User user = userDao.findById(id);
         assertEquals("DH", user.getName());
-        assertEquals("DH", user.getName());
+        assertEquals("DH", user.getPassword());
     }
 }
 
