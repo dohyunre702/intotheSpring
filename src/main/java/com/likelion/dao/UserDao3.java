@@ -77,28 +77,39 @@ public class UserDao3 {
     public void deleteAll() {
         Connection c = null;
         PreparedStatement ps = null;
-
+        ResultSet rs = null;
         try {
             c = cm.makeConnection();
             ps = c.prepareStatement("DELETE FROM users"); //쿼리 입력
-            ps.executeUpdate(); //쿼리 업데이트
-        //connection, preparedStatement에서 에러가 나도 ps.close() c.close()를 실행하기 위한 처리
+            rs = ps.executeQuery();
+            rs.next(); //쿼리 업데이트
+            return rs.getInt(1);
+
+            //c, ps, rs가 null일 때 리소스 반환이 불가해 서버가 down되는 치명적 문제 발생
+            //connection, preparedStatement에서 에러가 나도 ps.close() c.close()를 실행하기 위한 처리
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {//errror가 나도 실행되는 블럭
-            if (ps != null) {
+            if (rs != null) {
                 try {
-                    ps.close();
+                    rs.close();
                 } catch (SQLException e) {
                 }
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {
+                if (ps != null) {
+                    try {
+                        ps.close();
+                    } catch (SQLException e) {
+                    }
+                }
+                if (c != null) {
+                    try {
+                        c.close();
+                    } catch (SQLException e) {
+                    }
                 }
             }
         }
+    }
 
         //쿼리 count
         public int getCount() {
@@ -122,7 +133,6 @@ public class UserDao3 {
                 throw new RuntimeException(e);
             }
         }
-    }
             public static void main (String[]args){
                 UserDao3 userDao = new UserDao3();
                 //userDao.add(new User("7", "Ruru", "1234"));
