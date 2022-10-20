@@ -55,14 +55,17 @@ public class UserDao3 {
 
             //query문 실행
             ResultSet rs = pstmt.executeQuery(); //ResultSet?
-            rs.next();
-
-            User user = new User(rs.getString("id"), rs.getString("name"), rs.getString("name"));
-
+            User user = null;
+            // rs.next(); null;
+            if (rs.next()) {
+                user = new User(rs.getString("id"), rs.getString("name"), rs.getString("name"));
+            }
             rs.close();
             pstmt.close();
             c.close();
 
+            //데이터 생길 때 생기는 예외 처리하기
+            if(user==null) throw new EmptyResultDataAccessException(1);
             return user;
 
         } catch (SQLException e) {
