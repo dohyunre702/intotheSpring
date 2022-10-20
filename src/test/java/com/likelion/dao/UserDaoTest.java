@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-@ExtendWith(SpringExtension.class) //스프링 테스트를 사용하기 위한 설정
+@ExtendWith(SpringExtension.class) //스프링에서 junit 테스트를 사용하기 위한 설정. 없으면 autowired 사용불가
 @ContextConfiguration(classes = UserDaoFactory.class) //설정 정보 불러오기
 
 class UserDao3Test {

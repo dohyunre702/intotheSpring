@@ -75,44 +75,54 @@ public class UserDao3 {
 
     //삭제
     public void deleteAll() {
-        Map<String, String> env = System.getenv();
+        Connection c = null;
+        PreparedStatement ps = null;
+
         try {
-            Connection conn = cm.makeConnection();
-
-            //쿼리 입력
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM users");
-
-            //쿼리 실행
-            ps.executeUpdate();
-            System.out.println("DB DeleteAll 완료");
+            c = cm.makeConnection();
+            ps = c.prepareStatement("DELETE FROM users"); //쿼리 입력
+            ps.executeUpdate(); //쿼리 업데이트
+        //connection, preparedStatement에서 에러가 나도 ps.close() c.close()를 실행하기 위한 처리
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {//errror가 나도 실행되는 블럭
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                }
+            }
         }
-    }
 
         //쿼리 count
-        public int getCount () {
-            Map<String, String> env = System.getenv();
+        public int getCount() {
+            Map<String, String> env = System.getenv(); //없어도 됨?
             try {
                 Connection conn = cm.makeConnection();
 
-                PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM users;");
+                PreparedStatement psCnt = conn.prepareStatement("SELECT COUNT(*) FROM users;");
 
                 //쿼리 입력
-                ResultSet rs = ps.executeQuery();
+                ResultSet rs = psCnt.executeQuery();
                 System.out.println("DB Get Count");
                 rs.next();
                 int count = rs.getInt(1);
 
                 rs.close();
-                ps.close();
+                psCnt.close();
                 conn.close();
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }
     }
-
             public static void main (String[]args){
                 UserDao3 userDao = new UserDao3();
                 //userDao.add(new User("7", "Ruru", "1234"));
