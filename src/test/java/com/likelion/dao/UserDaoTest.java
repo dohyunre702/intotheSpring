@@ -23,12 +23,19 @@ class UserDao3Test {
     ApplicationContext context; //ApplicationContext 인터페이스 선언
 
     UserDao3 userDao;
+    User user1;
+    User user2;
+    User user3;
 
     @BeforeEach
     //@BeforeEach는 Juint5 이후 추가된 애너테이션
     void setUp(){
         this.userDao = context.getBean("awsUserDao", UserDao3.class);
-        System.out.println("before each");
+        //중복을 제거하기 위해 Autowired에 user1,2,3를 정의하고 this로 사용
+        this.user1 = new User("1", "Kim", "1123");
+        this.user2 = new User("2", "Cho", "3321");
+        this.user3 = new User("3", "Jang", "5532");
+
     }
 
 
@@ -56,10 +63,6 @@ class UserDao3Test {
 //        ApplicationContext context = new GenericXmlApplicationContext(
 //                "applicationContext.xml");
 
-        User user1 = new User("1", "Kim", "1123");
-        User user2 = new User("2", "Cho", "3321");
-        User user3 = new User("3", "Jang", "5532");
-
         UserDao3 userDao = context.getBean("awsUdserDao", UserDao3.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCount());
@@ -79,8 +82,6 @@ class UserDao3Test {
                     userDao.findById("30");
                 });
     }
-
-
 }
 
         /*
