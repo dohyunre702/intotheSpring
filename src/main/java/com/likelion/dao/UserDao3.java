@@ -22,7 +22,6 @@ public class UserDao3 {
     public void add(User user)  {
         Map<String, String> env = System.getenv();
         try {
-
             //db 접속
             Connection conn = cm.makeConnection();
 
@@ -74,44 +73,44 @@ public class UserDao3 {
     }
 
     //삭제
-    public void deleteAll() {
+    public void deleteAll() throws SQLException {
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             c = cm.makeConnection();
-            ps = c.prepareStatement("DELETE FROM users"); //쿼리 입력
+            ps = new DeleteAllStrategy().makePreparedStatement(c);
             rs = ps.executeQuery();
             rs.next(); //쿼리 업데이트
 
             //c, ps, rs가 null일 때 리소스 반환이 불가해 서버가 down되는 치명적 문제 발생
             //connection, preparedStatement에서 에러가 나도 ps.close() c.close()를 실행하기 위한 처리
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
         } finally {//errror가 나도 실행되는 블럭
             if (rs != null) {
                 try {
                     rs.close();
                 } catch (SQLException e) {
                 }
-                if (ps != null) {
-                    try {
-                        ps.close();
-                    } catch (SQLException e) {
-                    }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
                 }
-                if (c != null) {
-                    try {
-                        c.close();
-                    } catch (SQLException e) {
-                    }
+            }
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
                 }
             }
         }
     }
+}
 
         //쿼리 count
-        public int getCount() {
+        public int getCount() throws SQLException {
             Connection c = null;
             PreparedStatement psCnt = null;
             ResultSet rs = null;
@@ -123,7 +122,7 @@ public class UserDao3 {
                 return rs.getInt(1);
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw e;
             } finally {
                 if (rs != null) {
                     try {
