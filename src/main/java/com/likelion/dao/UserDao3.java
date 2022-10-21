@@ -17,29 +17,43 @@ public class UserDao3 {
         this.cm = cm;
     }
 
+    //add(). 공통로직 분리
+    //WithStatementStrategy : 파라미터로 StatementStrategy를 받음을 암시
+    public Object jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+        Connection c = null;
+        PreparedStatement ps = null;
 
-    //insert문
-    public void add(User user)  {
-        Map<String, String> env = System.getenv();
         try {
             //db 접속
             Connection conn = cm.makeConnection();
-
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO users(id, name, password) VALUES (?, ?, ?)");
-            //query문 작성
-                ps.setString(1, user.getId());
-                ps.setString(2, user.getName());
-                ps.setString(3, user.getPassword());
+            ps = stmt.makePreparedStatement(c);
             //query문 실행
-                int status = ps.executeUpdate();
-
-                ps.close();
-                conn.close();
+            int status = ps.executeUpdate();
+            ps.close();
+            conn.close();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } finally {
+            //errror가 나도 실행되는 블럭
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                }
+
+                ps.close();
+                c.close();
+            }
         }
     }
+
+    //insert문
 
     public User findById(String id) {
         //connection separate
