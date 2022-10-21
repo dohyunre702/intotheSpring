@@ -7,6 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class AddStrategy implements StatementStrategy{
+    // user 생성자 추가
+    User user;
+
+    public AddStrategy(User user) {
+        this.user = user;
+    }
+
     //Addstrategy 도입
     @Override
     public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
