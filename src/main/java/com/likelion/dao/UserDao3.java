@@ -46,11 +46,14 @@ public class UserDao3 {
                     c.close();
                 } catch (SQLException e) {
                 }
-
-                ps.close();
-                c.close();
             }
         }
+    }
+
+    //익명 클래스
+    public void add(User user) throws SQLException {
+        AddStrategy addStrategy = new AddStrategy(user);
+        jdbcContextWithStatementStrategy(addStrategy);
     }
 
     //insert문
