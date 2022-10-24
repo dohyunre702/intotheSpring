@@ -2,12 +2,18 @@ package com.likelion.dao;
 
 import com.likelion.domain.User;
 
+import javax.sql.DataSource; //DataSource 추가
 import java.sql.*;
 import java.util.Map;
 
 public class UserDao3 {
 
     private ConnectionMaker cm;
+    private DataSource dataSource; //DataSource 의존하게 변경
+
+    public UserDao3(DataSource dataSource) {
+        this.dataSource = dataSource; //생성자 변경
+    }
 
     public UserDao3() {
         this.cm = new AwsConnectionMaker();
@@ -25,12 +31,12 @@ public class UserDao3 {
 
         try {
             //db 접속
-            Connection conn = cm.makeConnection();
+            c = dataSource.getConnection(); //datasource 수정
             ps = stmt.makePreparedStatement(c);
             //query문 실행
             int status = ps.executeUpdate();
             ps.close();
-            conn.close();
+
 
         } catch (SQLException e) {
         } finally {
@@ -63,8 +69,7 @@ public class UserDao3 {
         Map<String, String> env = System.getenv();
         try {
             //DB접속
-            Connection c = cm.makeConnection();
-
+            Connection c = dataSource.getConnection(); //datasource 수정
             //query문 작성
             PreparedStatement pstmt = c.prepareStatement("SELECT * FROM users WHERE id = ?");
             pstmt.setString(1, id);
@@ -95,7 +100,7 @@ public class UserDao3 {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = cm.makeConnection();
+            c = dataSource.getConnection(); //datasource 수정
             ps = new DeleteAllStrategy().makePreparedStatement(c);
             rs = ps.executeQuery();
             rs.next(); //쿼리 업데이트
@@ -132,7 +137,7 @@ public class UserDao3 {
             PreparedStatement psCnt = null;
             ResultSet rs = null;
             try {
-                c = cm.makeConnection();
+                c = dataSource.getConnection(); //datasource 수정
                 psCnt = c.prepareStatement("SELECT COUNT(*) FROM users;"); //쿼리 입력
                 rs = psCnt.executeQuery();
                 rs.next(); //쿼리 업데이트
